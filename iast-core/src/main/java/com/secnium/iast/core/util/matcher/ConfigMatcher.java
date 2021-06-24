@@ -1,11 +1,11 @@
 package com.secnium.iast.core.util.matcher;
 
 import com.secnium.iast.core.PropertyUtils;
-import com.secnium.iast.core.enhance.IASTClassFileTransformer;
+import com.secnium.iast.core.enhance.IastClassFileTransformer;
 import com.secnium.iast.core.util.ConfigUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class ConfigMatcher {
 
-    private final static Logger logger = LoggerFactory.getLogger(ConfigMatcher.class);
+    private final static Logger logger = LogUtils.getLogger(ConfigMatcher.class);
 
     public final static HashSet<String> SOURCES;
     private final static HashSet<String> BLACKS;
@@ -30,7 +30,7 @@ public class ConfigMatcher {
     private final static AbstractMatcher internalClass = new InternalClass();
     private final static AbstractMatcher frameworkClass = new FrameworkClass();
     private final static AbstractMatcher serverClass = new ServerClass();
-    private final static ClassLoader iastClassLoader = IASTClassFileTransformer.class.getClassLoader();
+    private final static ClassLoader iastClassLoader = IastClassFileTransformer.class.getClassLoader();
 
 
     public static boolean disableExtention(String uri) {

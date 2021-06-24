@@ -6,6 +6,7 @@ import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,16 +18,16 @@ import java.util.jar.JarFile;
  * @author dongzhiyong@huoxian.cn
  */
 public class EngineManager {
-    private static final String IAST_NAMESPACE = "LINGZHI";
-    private static final String ENGINE_ENTERPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
+    private static final String IAST_NAMESPACE = "DONGTAI";
+    private static final String ENGINE_ENTRYPOINT_CLASS = "com.secnium.iast.core.AgentEngine";
     private static final String INJECT_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-inject&jdk.version=";
     private static final String ENGINE_PACKAGE_REMOTE_URI = "/api/v1/engine/download?package_name=iast-core&jdk.version=";
-    private static final Map<String, IASTClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IASTClassLoader>();
+    private static final Map<String, IastClassLoader> IAST_CLASS_LOADER_CACHE = new ConcurrentHashMap<String, IastClassLoader>();
     private static EngineManager INSTANCE;
 
     private final Instrumentation inst;
     private int runningStatus;
-    private final IASTProperties properties;
+    private final IastProperties properties;
     private final String launchMode;
     private Class<?> classOfEngine;
     private final String ppid;
@@ -54,7 +55,7 @@ public class EngineManager {
      *
      * @param inst       instrumentation接口实例化对象
      * @param launchMode IAST引擎的启动模式，attach、premain两种
-     * @param ppid       IAST引擎运行的进程ID，用于后续尽心热更新
+     * @param ppid       IAST引擎运行的进程ID，用于后续进行热更新
      * @return IAST引擎管理器的实例化对象
      */
     public static EngineManager getInstance(Instrumentation inst, String launchMode, String ppid) {
@@ -77,7 +78,7 @@ public class EngineManager {
         this.inst = inst;
         this.runningStatus = 0;
         this.launchMode = launchMode;
-        this.properties = IASTProperties.getInstance();
+        this.properties = IastProperties.getInstance();
         this.ppid = ppid;
     }
 
@@ -110,7 +111,8 @@ public class EngineManager {
         boolean status = false;
         try {
             URL url = new URL(fileUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            Proxy proxy = UpdateUtils.loadProxy();
+            HttpURLConnection connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
 
             connection.setRequestMethod("GET");
             connection.setRequestProperty("User-Agent", "SecniumIast Agent");
@@ -122,7 +124,7 @@ public class EngineManager {
             final File classPath = new File(new File(fileName).getParent());
 
             if (!classPath.mkdirs() && !classPath.exists()) {
-                System.out.println("[com.lingzhi.agent] Check or create local file cache path, path is " + classPath);
+                System.out.println("[cn.huoxian.dongtai.iast] Check or create local file cache path, path is " + classPath);
             }
             FileOutputStream fileOutputStream = new FileOutputStream(fileName);
             byte[] dataBuffer = new byte[1024];
@@ -130,10 +132,10 @@ public class EngineManager {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-            System.out.println("[com.lingzhi.agent] The remote file " + fileUrl + " was successfully written to the local cache.");
+            System.out.println("[cn.huoxian.dongtai.iast] The remote file " + fileUrl + " was successfully written to the local cache.");
             status = true;
         } catch (Exception ignore) {
-            System.err.println("[com.lingzhi.agent] The remote file " + fileUrl + " download failure, please check the iast-token.");
+            System.err.println("[cn.huoxian.dongtai.iast] The remote file " + fileUrl + " download failure, please check the iast-token.");
         }
         return status;
     }
@@ -158,13 +160,13 @@ public class EngineManager {
 
 
     public boolean downloadEnginePackage() {
-        System.out.println("[com.lingzhi.agent] Check if the engine needs to be updated");
-        if (UpdateUtils.checkForUpdate()) {
-            System.out.println("[com.lingzhi.agent] Receive an instruction from the remote server to update the engine, update the engine immediately");
+        System.out.println("[cn.huoxian.dongtai.iast] Check if the engine needs to be updated");
+        if (UpdateUtils.needUpdate()) {
+            System.out.println("[cn.huoxian.dongtai.iast] Receive an instruction from the remote server to update the engine, update the engine immediately");
             return updateEnginePackage();
         } else {
             if (engineNotExist(getInjectPackageCachePath()) || engineNotExist(getEnginePackageCachePath())) {
-                System.out.println("[com.lingzhi.agent] Engine does not exist in local cache, the engine will be downloaded.");
+                System.out.println("[cn.huoxian.dongtai.iast] Engine does not exist in local cache, the engine will be downloaded.");
                 return updateEnginePackage();
             } else {
                 return true;
@@ -182,18 +184,18 @@ public class EngineManager {
             if (iastClassLoader == null) {
                 iastClassLoader = loadOrDefineClassLoader(EngineManager.getEnginePackageCachePath());
             }
-            classOfEngine = iastClassLoader.loadClass(ENGINE_ENTERPOINT_CLASS);
+            classOfEngine = iastClassLoader.loadClass(ENGINE_ENTRYPOINT_CLASS);
             classOfEngine.getMethod("install", String.class, String.class, Instrumentation.class)
                     .invoke(null, launchMode, this.properties.getPropertiesFilePath(), inst);
             return true;
         } catch (IOException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine installation failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine installation failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine installation failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine installation failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -211,16 +213,16 @@ public class EngineManager {
             }
             return false;
         } catch (InvocationTargetException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine start failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine start failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -240,19 +242,19 @@ public class EngineManager {
             }
             return false;
         } catch (InvocationTargetException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             System.err.println(sw.toString());
         } catch (NoSuchMethodException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             e.printStackTrace();
         } catch (Throwable throwable) {
-            System.err.println("[com.lingzhi.agent] LingZhi engine stop failed, please contact staff for help.");
+            System.err.println("[cn.huoxian.dongtai.iast] DongTai engine stop failed, please contact staff for help.");
             throwable.printStackTrace();
         }
         return false;
@@ -273,7 +275,7 @@ public class EngineManager {
      * @question: 通过 inst.appendToBootstrapClassLoaderSearch() 方法加入的jar包无法直接卸载；
      */
     public synchronized boolean uninstall() {
-        final IASTClassLoader classLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
+        final IastClassLoader classLoader = IAST_CLASS_LOADER_CACHE.get(IAST_NAMESPACE);
         if (null == classLoader) {
             return true;
         }
@@ -311,7 +313,7 @@ public class EngineManager {
      */
     private static synchronized ClassLoader loadOrDefineClassLoader(final String coreJar) throws Throwable {
 
-        final IASTClassLoader classLoader;
+        final IastClassLoader classLoader;
 
         // 如果已经被启动则返回之前启动的ClassLoader
         if (IAST_CLASS_LOADER_CACHE.containsKey(EngineManager.IAST_NAMESPACE)
@@ -321,7 +323,7 @@ public class EngineManager {
 
         // 如果未启动则重新加载
         else {
-            classLoader = new IASTClassLoader(EngineManager.IAST_NAMESPACE, coreJar);
+            classLoader = new IastClassLoader(EngineManager.IAST_NAMESPACE, coreJar);
             IAST_CLASS_LOADER_CACHE.put(EngineManager.IAST_NAMESPACE, classLoader);
         }
 
@@ -337,7 +339,7 @@ public class EngineManager {
     private static boolean engineNotExist(final String jarPath) {
         String isDebug = System.getProperty("debug");
         if ("true".equals(isDebug)) {
-            System.out.println("[com.lingzhi.agent] debug mode is " + isDebug);
+            System.out.println("[cn.huoxian.dongtai.iast] current mode: debug, load engine from " + jarPath);
             File tempFile = new File(jarPath);
             return !tempFile.exists();
         } else {
@@ -353,9 +355,9 @@ public class EngineManager {
     private static String getJdkVersion() {
         String jdkVersion = System.getProperty("java.version", "1.8");
         System.out.println("current jdk version is : " + jdkVersion);
-        String[] jdkVersions = jdkVersion.split("\\.");
+        String[] jdkVersionItem = jdkVersion.split("\\.");
         boolean isHighJdk = true;
-        if (jdkVersions.length > 1 && ("6".equals(jdkVersions[1]) || "7".equals(jdkVersions[1]) || "8".equals(jdkVersions[1]))) {
+        if (jdkVersionItem.length > 1 && ("6".equals(jdkVersionItem[1]) || "7".equals(jdkVersionItem[1]) || "8".equals(jdkVersionItem[1]))) {
             isHighJdk = false;
         }
         return isHighJdk ? "2" : "1";

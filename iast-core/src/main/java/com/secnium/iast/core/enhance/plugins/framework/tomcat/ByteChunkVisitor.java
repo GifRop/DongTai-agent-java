@@ -1,11 +1,11 @@
 package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 
@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier;
 public class ByteChunkVisitor extends AbstractClassVisitor {
 
 
-    public ByteChunkVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public ByteChunkVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
@@ -39,5 +39,5 @@ public class ByteChunkVisitor extends AbstractClassVisitor {
         return mv;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
 }

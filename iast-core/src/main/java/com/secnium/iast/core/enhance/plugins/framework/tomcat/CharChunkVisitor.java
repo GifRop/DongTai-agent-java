@@ -1,11 +1,11 @@
 package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 
@@ -14,11 +14,11 @@ import java.lang.reflect.Modifier;
  */
 public class CharChunkVisitor extends AbstractClassVisitor {
 
-    private IASTContext IASTContext;
+    private IastContext IastContext;
 
-    public CharChunkVisitor(ClassVisitor classVisitor, IASTContext context) {
+    public CharChunkVisitor(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
-        this.IASTContext = context;
+        this.IastContext = context;
     }
 
     @Override
@@ -35,11 +35,11 @@ public class CharChunkVisitor extends AbstractClassVisitor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Instrumenting Tomcat's ByteChunk recycle() method");
             }
-            mv = new CharChunkAdapter(mv, access, name, desc, IASTContext);
+            mv = new CharChunkAdapter(mv, access, name, desc, IastContext);
             transformed = true;
         }
         return mv;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
 }

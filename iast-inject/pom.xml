@@ -5,7 +5,7 @@
     <parent>
         <artifactId>iast</artifactId>
         <groupId>com.secnium.iast</groupId>
-        <version>0.5.2</version>
+        <version>0.6.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -69,11 +69,6 @@
                         <configuration>
                             <tasks>
                                 <copy todir="./../release/lib">
-                                    <fileset dir="target/">
-                                        <include name="iast-inject.jar"/>
-                                    </fileset>
-                                </copy>
-                                <copy todir="./../../../dongtai-openapi/iast-package">
                                     <fileset dir="target/">
                                         <include name="iast-inject.jar"/>
                                     </fileset>

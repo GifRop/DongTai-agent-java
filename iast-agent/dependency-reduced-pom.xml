@@ -3,7 +3,7 @@
   <parent>
     <artifactId>iast</artifactId>
     <groupId>com.secnium.iast</groupId>
-    <version>0.5.2</version>
+    <version>0.6.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>iast-agent</artifactId>
@@ -77,26 +77,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <version>${proguard.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>proguard</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <obfuscate>true</obfuscate>
-          <injar>${project.build.finalName}.jar</injar>
-          <outjar>${project.build.finalName}.jar</outjar>
-          <outputDirectory>${project.build.directory}</outputDirectory>
-          <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
@@ -107,11 +87,6 @@
             </goals>
             <configuration>
               <tasks>
-                <copy>
-                  <fileset>
-                    <include />
-                  </fileset>
-                </copy>
                 <copy>
                   <fileset>
                     <include />
@@ -128,7 +103,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.9</version>
+      <version>4.13.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

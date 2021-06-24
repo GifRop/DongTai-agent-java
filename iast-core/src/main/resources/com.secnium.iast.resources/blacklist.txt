@@ -1,13 +1,50 @@
+# other javaagent
+# pinpoint javaagent
+com/navercorp/pinpoint/*
+#com/navercorp/pinpoint/agent/*
+#com/navercorp/pinpoint/bootstrap/*
+#com/navercorp/pinpoint/common/*
+#com/navercorp/pinpoint/grpc/*
+#com/navercorp/pinpoint/loader/*
+#com/navercorp/pinpoint/profiler/*
 # ehcache - cache need't hook
 net/sf/ehcache/*
 # bytebuddy - need't hook
 net/bytebuddy/*
+# skywalking
+org/apache/skywalking/*
+# jacoco
+org/jacoco/*
 # self package - need't hook
 com/secnium/*
 # apple package
 apple/*
 # octo
 com/octo/captcha/*
+# apache shaded
+org/apache/curator/shaded/*
+# redis client
+org/redisson/*
+# quartz
+org/quartz/*
+# sharding-jdbc
+io/shardingjdbc/*
+# micrometer
+io/micrometer/*
+#
+groovy/*
+# https://github.com/AutoGeneral/cors-filter
+com/thetransactioncompany/*
+# protobuf
+com/google/protobuf/*
+#Spring Cloud Sleuth
+com/github/benmanes/caffeine/*
+# spring
+org/springframework/cloud/sleuth/*
+#
+io/netty/handler/codec/*
+# fastjson
+com/alibaba/fastjson/*
 # old rule
 EDU/oswego/cs/dl/util/concurrent/BoundedChannel
 EDU/oswego/cs/dl/util/concurrent/BoundedLinkedQueue
@@ -18893,7 +18930,7 @@ com/sun/org/apache/xerces/internal/impl/XMLNSDocumentScannerImpl$NSContentDispat
 com/sun/org/apache/xerces/internal/impl/XMLNSDocumentScannerImpl$NSContentDriver
 com/sun/org/apache/xerces/internal/impl/XMLScanner
 com/sun/org/apache/xerces/internal/impl/XMLScanner$NameType
-# lingzhi xxe
+# dongtai xxe
 #com/sun/org/apache/xerces/internal/impl/XMLStreamReaderImpl
 com/sun/org/apache/xerces/internal/impl/XMLStreamReaderImpl$1
 com/sun/org/apache/xerces/internal/impl/XMLVersionDetector
@@ -56685,13 +56722,14 @@ org/quartz/spi/SchedulerPlugin
 org/quartz/spi/SchedulerSignaler
 org/quartz/spi/ThreadPool
 org/quartz/spi/TriggerFiredBundle
-org/quartz/utils/ConnectionProvider
-org/quartz/utils/DBConnectionManager
-org/quartz/utils/JNDIConnectionProvider
-org/quartz/utils/Key
-org/quartz/utils/Pair
-org/quartz/utils/PropertiesParser
-org/quartz/utils/StringKeyDirtyFlagMap
+org/quartz/utils/*
+#org/quartz/utils/ConnectionProvider
+#org/quartz/utils/DBConnectionManager
+#org/quartz/utils/JNDIConnectionProvider
+#org/quartz/utils/Key
+#org/quartz/utils/Pair
+#org/quartz/utils/PropertiesParser
+#org/quartz/utils/StringKeyDirtyFlagMap
 org/rhq/core/communications/command/annotation/Asynchronous
 org/rhq/core/communications/command/annotation/LimitedConcurrency
 org/rhq/core/communications/command/annotation/Timeout
@@ -74260,7 +74298,7 @@ workshop/util/encoding/EncodingReader
 workshop/util/encoding/impl/PropertiesEncoding
 workshop/util/encoding/impl/TextEncoding
 com/alibaba/fastjson/parser/deserializer/FastjsonASMDeserializer_1_RepeaterConfig
-# disable alibaba sandbox's class lingzhi-001
+# disable alibaba sandbox's class dongtai-001
 com/alibaba/jvm/sandbox/*
 # Debug
 org/jetbrains/*
@@ -74282,7 +74320,7 @@ org/yaml/snakeyaml/representer/BaseRepresenter$1
 # httpclient
 org/apache/http/conn/EofSensorInputStream
 org/apache/http/client/entity/LazyDecompressingInputStream
-# httpclient 5 lingzhi ssrf black list
+# httpclient 5 dongtai ssrf black list
 org/apache/hc/core5/http/io/EofSensorInputStream
 org/apache/hc/core5/http/impl/io/ContentLengthInputStream
 org/apache/hc/core5/http/impl/io/EmptyInputStream

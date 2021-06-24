@@ -2,13 +2,13 @@ package com.secnium.iast.core.engines.impl;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.core.handler.models.IASTHookRuleModel;
+import com.secnium.iast.core.handler.models.IastHookRuleModel;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.Asserts;
 import com.secnium.iast.core.util.ThrowableUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.lang.instrument.Instrumentation;
  * @author dongzhiyong@huoxian.cn
  */
 public class ConfigEngine implements IEngine {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(ConfigEngine.class);
     private PropertyUtils cfg;
     private Instrumentation inst;
 
@@ -32,7 +32,7 @@ public class ConfigEngine implements IEngine {
     @Override
     public void start() {
         logger.info("Initialize the core configuration of the engine");
-        IASTHookRuleModel.buildModel();
+        IastHookRuleModel.buildModel();
         logger.info("The engine's core configuration is initialized successfully.");
     }
 

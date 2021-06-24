@@ -3,11 +3,12 @@ package com.secnium.iast.core.handler.controller.impl;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.overpower.LoginLogicRecognize;
+import com.secnium.iast.core.middlewarerecognition.IastServer;
 import com.secnium.iast.core.util.http.HttpRequest;
 import com.secnium.iast.core.util.http.HttpResponse;
 import com.secnium.iast.core.util.matcher.ConfigMatcher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,8 +37,9 @@ public class HttpImpl {
                 EngineManager.setIsLoginLogic();
             }
 
-            EngineManager.SERVER_ADDR.set(request.getServerName());
-            EngineManager.SERVER_PORT.set(request.getServerPort());
+            if (null == EngineManager.SERVER) {
+                EngineManager.SERVER = new IastServer(request.getServerName(), request.getServerPort(), true);
+            }
             EngineManager.ENTER_HTTP_ENTRYPOINT.enterHttpEntryPoint();
             EngineManager.REQUEST_CONTEXT.set(request);
             EngineManager.RESPONSE_CACHE.set(new HttpResponse(event.argumentArray[1]));
@@ -51,5 +53,5 @@ public class HttpImpl {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpImpl.class);
+    private static final Logger logger = LogUtils.getLogger(HttpImpl.class);
 }

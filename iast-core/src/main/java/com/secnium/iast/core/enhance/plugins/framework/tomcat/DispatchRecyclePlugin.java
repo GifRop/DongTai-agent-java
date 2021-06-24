@@ -1,14 +1,14 @@
 package com.secnium.iast.core.enhance.plugins.framework.tomcat;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
-import com.secnium.iast.core.enhance.plugins.propagator.PropagateAdviceAdapter;
+import com.secnium.iast.core.enhance.plugins.core.adapter.PropagateAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * @author dongzhiyong@huoxian.cn
@@ -22,7 +22,7 @@ public class DispatchRecyclePlugin implements DispatchPlugin {
     private String className;
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         //
         if (isCharChunk(context)) {
             classVisitor = new CharChunkVisitor(classVisitor, context);
@@ -48,30 +48,30 @@ public class DispatchRecyclePlugin implements DispatchPlugin {
         return null;
     }
 
-    private boolean isCharChunk(IASTContext iastContext) {
+    private boolean isCharChunk(IastContext iastContext) {
         return isMatch(charChunkClass, iastContext);
     }
 
 
-    private boolean isByteChunk(IASTContext iastContext) {
+    private boolean isByteChunk(IastContext iastContext) {
         return isMatch(byteChunkClass, iastContext);
     }
 
 
-    private boolean isRequest(IASTContext iastContext) {
+    private boolean isRequest(IastContext iastContext) {
         return isMatch(requestClass, iastContext);
     }
 
 
-    private boolean isMatch(String paramString, IASTContext iastContext) {
+    private boolean isMatch(String paramString, IastContext iastContext) {
         return paramString.equals(iastContext.getClassName());
     }
 
 
     public static class OutputStreamAdapter extends AbstractClassVisitor {
-        private final Logger logger = LoggerFactory.getLogger(getClass());
+        private final Logger logger = LogUtils.getLogger(getClass());
 
-        public OutputStreamAdapter(ClassVisitor classVisitor, IASTContext context) {
+        public OutputStreamAdapter(ClassVisitor classVisitor, IastContext context) {
             super(classVisitor, context);
         }
 

@@ -1,7 +1,8 @@
 package com.secnium.iast.core.handler.graphy;
 
 import com.secnium.iast.core.EngineManager;
-import com.secnium.iast.core.enhance.IASTClassAncestorQuery;
+import com.secnium.iast.core.PropertyUtils;
+import com.secnium.iast.core.enhance.IastClassAncestorQuery;
 import com.secnium.iast.core.handler.models.MethodEvent;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.report.AgentRegisterReport;
@@ -32,6 +33,7 @@ public class GraphBuilder {
      * @return 污点方法列表
      */
     public static List<GraphNode> build() {
+        PropertyUtils properties = PropertyUtils.getInstance();
         List<GraphNode> nodeList = new ArrayList<GraphNode>();
         Map<Integer, MethodEvent> taintMethodPool = EngineManager.TRACK_MAP.get();
 
@@ -45,14 +47,16 @@ public class GraphBuilder {
                             event.getCallerClass(),
                             event.getCallerMethod(),
                             event.getCallerLine(),
-                            event.object != null ? IASTClassAncestorQuery.getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
+                            event.object != null ? IastClassAncestorQuery.getFamilyFromClass(event.object.getClass().getName().replace("\\.", "/")) : null,
                             event.getJavaClassName(),
                             event.getJavaMethodName(),
                             event.getJavaMethodDesc(),
                             "",
                             "",
                             event.getSourceHashes(),
-                            event.getTargetHashes()
+                            event.getTargetHashes(),
+                            properties.isLocal() ? event.obj2String(event.inValue) : "",
+                            properties.isLocal() ? event.obj2String(event.outValue) : ""
                     )
             );
         }
@@ -69,6 +73,7 @@ public class GraphBuilder {
         report.put(ReportConstant.REPORT_VALUE_KEY, detail);
 
         detail.put(ReportConstant.AGENT_NAME, AgentRegisterReport.getAgentToken());
+        detail.put(ReportConstant.PROJECT_NAME, AgentRegisterReport.getProjectName());
         detail.put(ReportConstant.COMMON_REMOTE_IP, request.getRemoteAddr());
         detail.put(ReportConstant.COMMON_HTTP_PROTOCOL, request.getProtocol());
         detail.put(ReportConstant.COMMON_HTTP_SCHEME, request.getScheme());

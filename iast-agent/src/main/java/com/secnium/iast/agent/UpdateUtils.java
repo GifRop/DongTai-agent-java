@@ -4,9 +4,7 @@ import org.json.JSONObject;
 
 import javax.net.ssl.*;
 import java.io.BufferedInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -14,18 +12,31 @@ import java.security.cert.X509Certificate;
  * @author dongzhiyong@huoxian.cn
  */
 public class UpdateUtils {
-    private final static String UPDATE_URL = IASTProperties.getInstance().getBaseUrl() + "/api/v1/engine/update";
+    private final static IastProperties PROPERTIES = IastProperties.getInstance();
+    private final static String UPDATE_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/update";
+    private final static String START_URL = PROPERTIES.getBaseUrl() + "/api/v1/engine/startstop";
     private final static String AGENT_TOKEN = URLEncoder.encode(AgentRegister.getAgentToken());
 
-    //负责发送http请求获取数据
-    public static boolean checkForUpdate() {
+    public static boolean needUpdate() {
         String respRaw = sendRequest(UPDATE_URL + "?agent_name=" + AGENT_TOKEN);
-        System.out.println(respRaw);
         if (respRaw != null && !respRaw.isEmpty()) {
             JSONObject resp = new JSONObject(respRaw);
             return "1".equals(resp.get("data").toString());
         }
         return false;
+    }
+
+    public static String checkForStatus() {
+        try {
+            String respRaw = sendRequest(START_URL + "?agent_name=" + AGENT_TOKEN);
+            if (respRaw != null && !respRaw.isEmpty()) {
+                JSONObject resp = new JSONObject(respRaw);
+                return resp.get("data").toString();
+            }
+        } catch (Exception e) {
+            return "other";
+        }
+        return "other";
     }
 
     public static void setUpdateSuccess() {
@@ -41,19 +52,18 @@ public class UpdateUtils {
         try {
             trustAllHosts();
             URL url = new URL(urlStr);
-            // 通过请求地址判断请求类型(http或者是https)
+            Proxy proxy = UpdateUtils.loadProxy();
 
-            if ("https".equals(url.getProtocol().toLowerCase())) {
-                HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            if (Constant.PROTOCOL_HTTPS.equalsIgnoreCase(url.getProtocol())) {
+                HttpsURLConnection https = proxy == null ? (HttpsURLConnection) url.openConnection() : (HttpsURLConnection) url.openConnection(proxy);
                 https.setHostnameVerifier(DO_NOT_VERIFY);
                 connection = https;
             } else {
-                connection = (HttpURLConnection) url.openConnection();
+                connection = proxy == null ? (HttpURLConnection) url.openConnection() : (HttpURLConnection) url.openConnection(proxy);
             }
-            connection.setRequestMethod("GET");
-            //fixme:根据配置文件动态获取token和http请求头，用于后续自定义操作
-            connection.setRequestProperty("User-Agent", "SecniumIast Java Agent ");
-            connection.setRequestProperty("Authorization", "Token " + IASTProperties.getInstance().getIastServerToken());
+            connection.setRequestMethod(Constant.HTTP_METHOD_GET);
+            connection.setRequestProperty("User-Agent", "SecniumIast Java Agent");
+            connection.setRequestProperty("Authorization", "Token " + PROPERTIES.getIastServerToken());
             connection.setRequestProperty("Accept", "*/*");
             connection.setUseCaches(false);
             connection.setDoOutput(true);
@@ -78,7 +88,6 @@ public class UpdateUtils {
     }
 
     public static void trustAllHosts() {
-        // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             @Override
             public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
@@ -95,14 +104,33 @@ public class UpdateUtils {
                 return new X509Certificate[0];
             }
         }};
-        // Install the all-trusting trust manager
+
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
+            SSLContext sc = SSLContext.getInstance(Constant.SSL_INSTANCE);
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
         }
     }
+
+    /**
+     * 根据配置文件创建http/https代理
+     */
+    public static Proxy loadProxy() {
+        try {
+            if (PROPERTIES.isProxyEnable()) {
+                Proxy proxy;
+                proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+                        PROPERTIES.getProxyHost(),
+                        PROPERTIES.getProxyPort()
+                ));
+                return proxy;
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
 
     public final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         @Override

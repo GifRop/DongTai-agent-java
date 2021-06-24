@@ -2,11 +2,11 @@ package com.secnium.iast.core.engines.impl;
 
 import com.secnium.iast.core.PropertyUtils;
 import com.secnium.iast.core.engines.IEngine;
-import com.secnium.iast.core.enhance.IASTClassFileTransformer;
+import com.secnium.iast.core.enhance.IastClassFileTransformer;
 import com.secnium.iast.core.report.ErrorLogReport;
 import com.secnium.iast.core.util.ThrowableUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.instrument.Instrumentation;
 
@@ -14,7 +14,7 @@ import java.lang.instrument.Instrumentation;
  * @author dongzhiyong@huoxian.cn
  */
 public class TransformEngine implements IEngine {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private PropertyUtils cfg;
     private Instrumentation inst;
 
@@ -28,7 +28,7 @@ public class TransformEngine implements IEngine {
     public void start() {
         try {
             logger.info("Install data acquisition and analysis sub-modules");
-            IASTClassFileTransformer.init(inst);
+            IastClassFileTransformer.init(inst);
             logger.info("The sub-module of data acquisition and analysis is successfully installed");
         } catch (Throwable cause) {
             logger.error("Failed to install the sub-module of data collection and analysis");
@@ -43,6 +43,6 @@ public class TransformEngine implements IEngine {
 
     @Override
     public void destroy() {
-        IASTClassFileTransformer.release(inst);
+        IastClassFileTransformer.release(inst);
     }
 }

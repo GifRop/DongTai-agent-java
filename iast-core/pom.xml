@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.secnium.iast</groupId>
         <artifactId>iast</artifactId>
-        <version>0.5.2</version>
+        <version>0.6.1</version>
     </parent>
     <artifactId>iast-core</artifactId>
     <name>iast-core</name>
@@ -16,20 +16,18 @@
     </properties>
 
     <build>
-        <!-- 1：asm 5；2：asm 8-->
         <finalName>iast-core</finalName>
 
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>lingzhi-log.xml</include>
+                    <include>logback-dongtai.xml</include>
                     <include>**/version</include>
                     <include>**/logo</include>
                     <include>**/blackext.txt</include>
                     <include>**/blacklist.txt</include>
                     <include>**/blacklistfunc.txt</include>
-                    <include>**/model.xml</include>
                     <include>**/sinks.txt</include>
                     <include>**/sources.txt</include>
                     <include>**/whitelist.txt</include>
@@ -109,29 +107,6 @@
             </plugin>
 
             <plugin>
-                <!-- https://mvnrepository.com/artifact/com.github.wvengen/proguard-maven-plugin -->
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <version>${proguard.version}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <obfuscate>true</obfuscate>
-                    <inLibsFilter>!module-info.class</inLibsFilter>
-                    <injar>${project.build.finalName}.jar</injar>
-                    <outjar>${project.build.finalName}.jar</outjar>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                    <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
@@ -204,14 +179,6 @@
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>${commons-configuration.version}</version>
-        </dependency>
-
 
         <!-- asm -->
         <dependency>

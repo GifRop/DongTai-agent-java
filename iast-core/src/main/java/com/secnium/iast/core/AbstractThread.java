@@ -2,7 +2,7 @@ package com.secnium.iast.core;
 
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import java.io.IOException;
  * @author dongzhiyong@huoxian.cn
  */
 public abstract class AbstractThread extends Thread {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private boolean enable;
 
     public boolean isEnable() {
@@ -40,7 +40,7 @@ public abstract class AbstractThread extends Thread {
             Thread.sleep(1000);
             send();
         } catch (IOException e) {
-            logger.error("authorization failed. please check you' iast-token. ");
+            logger.error("report error reason: ", e);
         } catch (Exception e) {
             logger.error("report error, reason: ", e);
         }

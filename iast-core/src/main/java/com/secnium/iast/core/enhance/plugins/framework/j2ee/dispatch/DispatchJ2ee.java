@@ -1,10 +1,10 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.DispatchPlugin;
 import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import java.util.Set;
  * @author dongzhiyong@huoxian.cn
  */
 public class DispatchJ2ee implements DispatchPlugin {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private final String FILTER = " javax/servlet/Filter".substring(1);
     private final String FILTERCHAIN = " javax/servlet/FilterChain".substring(1);
     private final String HTTP_SERVLET = " javax/servlet/http/HttpServlet".substring(1);
@@ -29,7 +29,7 @@ public class DispatchJ2ee implements DispatchPlugin {
 
 
     @Override
-    public ClassVisitor dispatch(ClassVisitor classVisitor, IASTContext context) {
+    public ClassVisitor dispatch(ClassVisitor classVisitor, IastContext context) {
         String className = context.getClassName();
         HashSet<String> ancestors = context.getAncestors();
 

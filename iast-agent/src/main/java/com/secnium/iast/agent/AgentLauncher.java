@@ -45,7 +45,7 @@ public class AgentLauncher {
      */
     public static void agentmain(String featureString, Instrumentation inst) {
         if ("uninstall".equals(featureString)) {
-            System.out.println("[com.lingzhi.agent] Engine is about to be uninstalled");
+            System.out.println("[cn.huoxian.dongtai.iast] Engine is about to be uninstalled");
             uninstall();
         } else {
             LAUNCH_MODE = LAUNCH_MODE_ATTACH;
@@ -69,24 +69,16 @@ public class AgentLauncher {
      * @param inst inst
      */
     private static void install(final Instrumentation inst) {
-        long startTime = System.nanoTime();
-        IASTProperties.getInstance();
+        IastProperties.getInstance();
+        loadEngine(inst);
+    }
+
+    private static void loadEngine(final Instrumentation inst) {
         EngineManager engineManager = EngineManager.getInstance(inst, LAUNCH_MODE, ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
-
-        boolean status = engineManager.downloadEnginePackage();
-        status = status && engineManager.install();
-        status = status && engineManager.start();
-
-        if (status) {
-            Thread agentMonitorDaemonThead = new Thread(new MonitorDaemonThread(engineManager));
-            agentMonitorDaemonThead.setDaemon(true);
-            agentMonitorDaemonThead.setName("lingzhi-agent-monitor");
-            agentMonitorDaemonThead.start();
-
-            System.out.println("[com.lingzhi.agent] Successfully opened the engine, and it takes  " + (System.nanoTime() - startTime) / 1000 / 1000 / 1000 + "s");
-        } else {
-            System.out.println("[com.lingzhi.agent] Engine start failed, start the application directly without starting the engine, and it takes  " + (System.nanoTime() - startTime) / 1000 / 1000 / 1000 + "s");
-        }
+        Thread agentMonitorDaemonThead = new Thread(new MonitorDaemonThread(engineManager));
+        agentMonitorDaemonThead.setDaemon(true);
+        agentMonitorDaemonThead.setName("dongtai-agent-monitor");
+        agentMonitorDaemonThead.start();
     }
 
 

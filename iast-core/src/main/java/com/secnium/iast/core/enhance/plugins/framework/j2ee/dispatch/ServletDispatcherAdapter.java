@@ -1,20 +1,20 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.util.AsmUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * @author dongzhiyong@huoxian.cn
  */
 public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
     private final static String HTTP_SERVLET_REQUEST = " javax.servlet.http.HttpServletRequest".substring(1);
     private final static String HTTP_SERVLET_RESPONSE = " javax.servlet.http.HttpServletResponse".substring(1);
     private final static String SERVLET_REQUEST = " javax.servlet.ServletRequest".substring(1);
@@ -25,7 +25,7 @@ public class ServletDispatcherAdapter extends AbstractClassVisitor {
 
     private final boolean isFaces;
 
-    ServletDispatcherAdapter(ClassVisitor classVisitor, IASTContext context) {
+    ServletDispatcherAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
         this.isFaces = FACES_SERVLET.equals(context.getClassName());
     }

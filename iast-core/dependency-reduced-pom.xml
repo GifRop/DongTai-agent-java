@@ -3,7 +3,7 @@
   <parent>
     <artifactId>iast</artifactId>
     <groupId>com.secnium.iast</groupId>
-    <version>0.5.2</version>
+    <version>0.6.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>iast-core</artifactId>
@@ -14,13 +14,12 @@
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
         <includes>
-          <include>lingzhi-log.xml</include>
+          <include>logback-dongtai.xml</include>
           <include>**/version</include>
           <include>**/logo</include>
           <include>**/blackext.txt</include>
           <include>**/blacklist.txt</include>
           <include>**/blacklistfunc.txt</include>
-          <include>**/model.xml</include>
           <include>**/sinks.txt</include>
           <include>**/sources.txt</include>
           <include>**/whitelist.txt</include>
@@ -96,27 +95,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <version>${proguard.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>proguard</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <obfuscate>true</obfuscate>
-          <inLibsFilter>!module-info.class</inLibsFilter>
-          <injar>${project.build.finalName}.jar</injar>
-          <outjar>${project.build.finalName}.jar</outjar>
-          <outputDirectory>${project.build.directory}</outputDirectory>
-          <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
@@ -143,7 +121,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.9</version>
+      <version>4.13.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

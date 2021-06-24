@@ -3,10 +3,10 @@ package com.secnium.iast.core.handler.vulscan.overpower;
 import com.secnium.iast.core.EngineManager;
 import com.secnium.iast.core.handler.vulscan.ReportConstant;
 import com.secnium.iast.core.util.Asserts;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 /**
  * Auth凭证信息生命周期管理
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author dongzhiyong@huoxian.cn
  */
 public class AuthInfoManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginLogicRecognize.class);
+    private static final Logger LOGGER = LogUtils.getLogger(LoginLogicRecognize.class);
     private static final String SET_COOKIE = "Set-Cookie";
 
     /**

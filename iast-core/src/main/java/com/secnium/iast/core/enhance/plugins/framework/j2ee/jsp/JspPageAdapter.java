@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins.framework.j2ee.jsp;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.plugins.AbstractClassVisitor;
 import com.secnium.iast.core.enhance.plugins.framework.j2ee.dispatch.ServletDispatcherAdviceAdapter;
 import com.secnium.iast.core.util.AsmUtils;
@@ -8,7 +8,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.secnium.iast.core.util.LogUtils;
 
 
 /**
@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
  */
 public class JspPageAdapter extends AbstractClassVisitor {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LogUtils.getLogger(getClass());
 
-    JspPageAdapter(ClassVisitor classVisitor, IASTContext context) {
+    JspPageAdapter(ClassVisitor classVisitor, IastContext context) {
         super(classVisitor, context);
     }
 
@@ -40,7 +40,7 @@ public class JspPageAdapter extends AbstractClassVisitor {
 
     private class JspAdviceAdapter extends ServletDispatcherAdviceAdapter {
 
-        JspAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, String signature, IASTContext context) {
+        JspAdviceAdapter(MethodVisitor methodVisitor, int access, String name, String desc, String signature, IastContext context) {
             super(methodVisitor, access, name, desc, signature, context);
         }
 

@@ -1,6 +1,6 @@
 package com.secnium.iast.core.enhance.plugins;
 
-import com.secnium.iast.core.enhance.IASTContext;
+import com.secnium.iast.core.enhance.IastContext;
 import com.secnium.iast.core.enhance.asm.AsmMethods;
 import com.secnium.iast.core.enhance.asm.AsmTypes;
 import com.secnium.iast.core.util.AsmUtils;
@@ -20,15 +20,17 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
     protected int access;
     protected Label tryLabel;
     protected Label catchLabel;
-    protected IASTContext context;
+    protected IastContext context;
     protected String type;
     protected String signature;
+    protected Type returnType;
+    protected boolean hasException;
 
     public AbstractAdviceAdapter(MethodVisitor mv,
                                  int access,
                                  String name,
                                  String desc,
-                                 IASTContext context,
+                                 IastContext context,
                                  String type,
                                  String signCode) {
         super(AsmUtils.api, mv, access, name, desc);
@@ -37,10 +39,12 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         this.desc = desc;
         this.context = context;
 
+        this.returnType = Type.getReturnType(desc);
         this.tryLabel = new Label();
         this.catchLabel = new Label();
         this.type = type;
         this.signature = signCode;
+        this.hasException = false;
     }
 
 
@@ -56,7 +60,9 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
      */
     @Override
     protected void onMethodExit(final int opcode) {
-        after(opcode);
+        if (!isThrow(opcode)) {
+            after(opcode);
+        }
     }
 
     protected abstract void before();
@@ -71,12 +77,18 @@ public abstract class AbstractAdviceAdapter extends AdviceAdapter implements Asm
         }
     }
 
+    /**
+     * 方法结束前，如何判断是否需要throw、return，解决堆栈未对齐
+     *
+     * @param maxStack
+     * @param maxLocals
+     */
     @Override
     public void visitMaxs(int maxStack, int maxLocals) {
         mark(catchLabel);
         visitTryCatchBlock(tryLabel, catchLabel, mark(), ASM_TYPE_THROWABLE.getInternalName());
 
-        //after(ATHROW);
+        after(ATHROW);
         throwException();
 
         super.visitMaxs(maxStack, maxLocals);
